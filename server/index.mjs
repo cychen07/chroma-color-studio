@@ -14,9 +14,11 @@ import { getPreset, gradePixels, presets } from '../shared/presets.mjs';
 import { normalizeAdjustments } from '../shared/adjustments.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+const vercel = !!process.env.VERCEL;
 const production = process.argv.includes('--production') || process.env.NODE_ENV === 'production';
 const port = Number(process.env.PORT || 3000);
-const dataDir = process.env.DATA_DIR || path.join(root, 'data');
+// Vercel's filesystem is read-only except /tmp and does not persist between invocations.
+const dataDir = process.env.DATA_DIR || (vercel ? '/tmp/chroma-data' : path.join(root, 'data'));
 const uploadDir = path.join(dataDir, 'uploads');
 mkdirSync(uploadDir, { recursive: true });
 const db = new DatabaseSync(path.join(dataDir, 'chroma.sqlite'));
@@ -24,7 +26,11 @@ db.exec(`PRAGMA journal_mode = WAL;
   CREATE TABLE IF NOT EXISTS colors (name TEXT PRIMARY KEY, collection TEXT, hex TEXT, family TEXT, record TEXT);
   CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, expires INTEGER);
   CREATE TABLE IF NOT EXISTS photos (id TEXT PRIMARY KEY, session TEXT, created INTEGER, payload TEXT);`);
-const dataset = JSON.parse(readFileSync(path.join(root, 'data/colors.json'), 'utf8'));
+const colorDataPath = [
+  path.join(root, 'data/colors.json'),
+  path.join(process.cwd(), 'data/colors.json'),
+].find(existsSync) || path.join(root, 'data/colors.json');
+const dataset = JSON.parse(readFileSync(colorDataPath, 'utf8'));
 const catalog = dataset.records.map(r => ({ ...r, labD65: rgbToLab([r.r, r.g, r.b]), family: colorFamily([r.r, r.g, r.b]) }));
 db.exec('BEGIN');
 const insert = db.prepare('INSERT OR REPLACE INTO colors VALUES (?, ?, ?, ?, ?)');
@@ -139,12 +145,17 @@ app.use((error, req, res, next) => {
   const status = error.code === 'LIMIT_FILE_SIZE' ? 413 : error.status || 500;
   res.status(status).json({ error: error.code === 'LIMIT_FILE_SIZE' ? '图片不能超过 20 MB。' : status < 500 ? error.message : '处理暂时失败，请稍后重试。' });
 });
-if (production) {
-  app.use(express.static(path.join(root, 'dist')));
-  app.get('/{*path}', (req, res) => res.sendFile(path.join(root, 'dist/index.html')));
-} else {
-  const { createServer } = await import('vite');
-  const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
-  app.use(vite.middlewares);
+// Vercel imports this module as a serverless function; static files and SPA routing
+// are handled by vercel.json rewrites, so do not attach Vite, static serving, or listen().
+if (!vercel && process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  if (production) {
+    app.use(express.static(path.join(root, 'dist')));
+    app.get('/{*path}', (req, res) => res.sendFile(path.join(root, 'dist/index.html')));
+  } else {
+    const { createServer } = await import('vite');
+    const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
+    app.use(vite.middlewares);
+  }
+  app.listen(port, '0.0.0.0', () => console.log(`色序 CHROMA → http://localhost:${port} · ${catalog.length} colors · ${production ? 'production' : 'development'} · free exports`));
 }
-app.listen(port, '0.0.0.0', () => console.log(`色序 CHROMA → http://localhost:${port} · ${catalog.length} colors · ${production ? 'production' : 'development'} · free exports`));
+export default app;

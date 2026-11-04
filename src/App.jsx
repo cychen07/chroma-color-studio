@@ -227,12 +227,35 @@ export default function App() {
     finally { if (request === activeRequest.current) setBusy(false); }
   }
   function loadDemo() { return applyPhoto(() => post('/api/demo')); }
-  function uploadFile(file) {
+  // Serverless hosts cap request bodies (Vercel Hobby: 4.5 MB), so shrink large photos
+  // in the browser before upload. The server still enforces its own 20 MB / 24 MP limits.
+  async function compressForUpload(file) {
+    const limit = 4.3 * 1024 * 1024;
+    if (file.size <= limit) return file;
+    const source = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    let longest = Math.max(source.width, source.height), blob = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const scale = Math.min(1, longest / Math.max(source.width, source.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(source.width * scale));
+      canvas.height = Math.max(1, Math.round(source.height * scale));
+      canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .9));
+      if (blob.size <= limit) break;
+      longest = Math.round(longest * .82);
+    }
+    source.close();
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  }
+  async function uploadFile(file) {
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError('支持 JPG、PNG 和 WebP，暂不支持 HEIC 或动图。'); return; }
     if (file.size > 20 * 1024 * 1024) { setError('图片不能超过 20 MB，请压缩后再试。'); return; }
-    const form = new FormData(); form.append('image', file);
-    applyPhoto(() => api('/api/photos', { method: 'POST', body: form }));
+    try {
+      const prepared = await compressForUpload(file);
+      const form = new FormData(); form.append('image', prepared);
+      applyPhoto(() => api('/api/photos', { method: 'POST', body: form }));
+    } catch { setError('图片读取失败，请换一张 JPG 或 PNG 后重试。'); }
   }
   function navigate(value) { setNav(value); setMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   function choosePreset(value) { setPresetId(value); setStrength(.75); setAdjustments(defaultAdjustments()); setCompare(false); }
