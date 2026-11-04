@@ -1,0 +1,27 @@
+{
+  "name": "chroma-color-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.mjs",
+    "build": "vite build",
+    "start": "node server/index.mjs --production",
+    "verify": "node scripts/verify.mjs",
+    "verify:adjustments": "node scripts/verify-adjustments.mjs",
+    "benchmark": "node scripts/benchmark.mjs",
+    "import:colors": "node scripts/import-colors.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "lucide-react": "^0.468.0",
+    "multer": "^2.0.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.34.4",
+    "vite": "^6.3.6"
+  },
+  "engines": { "node": ">=22.13.0" }
+}

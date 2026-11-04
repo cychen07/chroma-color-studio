@@ -1,0 +1,197 @@
+{
+  "measuredAt": "2026-11-04T06:56:53.051Z",
+  "machine": "Apple M3",
+  "node": "v24.7.0",
+  "runs": 3,
+  "note": "Local warm-process benchmark; CPU is cumulative across Sharp threads. 12MP source is a resized sample, not an independent camera photograph. Excludes HTTP, disk I/O, TLS, SQLite, idle server and page assets.",
+  "samples": [
+    {
+      "size": "native",
+      "width": 2560,
+      "height": 1536,
+      "runs": [
+        {
+          "normalize": {
+            "wallMs": 219.64,
+            "cpuMs": 210.55
+          },
+          "analyze": {
+            "wallMs": 166.51,
+            "cpuMs": 205.32
+          },
+          "preview": {
+            "wallMs": 175.64,
+            "cpuMs": 184.01
+          },
+          "presetExport": {
+            "wallMs": 362.28,
+            "cpuMs": 303.43
+          },
+          "manualExport": {
+            "wallMs": 2001.12,
+            "cpuMs": 1401.19
+          },
+          "bytes": {
+            "input": 969165,
+            "normalizedPng": 9121595,
+            "previewWebp": 391100,
+            "presetJpeg": 1441298,
+            "manualJpeg": 2335412
+          }
+        },
+        {
+          "normalize": {
+            "wallMs": 181.15,
+            "cpuMs": 191.35
+          },
+          "analyze": {
+            "wallMs": 104.74,
+            "cpuMs": 149.25
+          },
+          "preview": {
+            "wallMs": 167.99,
+            "cpuMs": 182.42
+          },
+          "presetExport": {
+            "wallMs": 257.1,
+            "cpuMs": 278.8
+          },
+          "manualExport": {
+            "wallMs": 1182.45,
+            "cpuMs": 1189.46
+          },
+          "bytes": {
+            "input": 969165,
+            "normalizedPng": 9121595,
+            "previewWebp": 391100,
+            "presetJpeg": 1441298,
+            "manualJpeg": 2335412
+          }
+        },
+        {
+          "normalize": {
+            "wallMs": 190.52,
+            "cpuMs": 196.96
+          },
+          "analyze": {
+            "wallMs": 227.32,
+            "cpuMs": 174.53
+          },
+          "preview": {
+            "wallMs": 423.24,
+            "cpuMs": 212.27
+          },
+          "presetExport": {
+            "wallMs": 302.01,
+            "cpuMs": 288.07
+          },
+          "manualExport": {
+            "wallMs": 1354.85,
+            "cpuMs": 1242.69
+          },
+          "bytes": {
+            "input": 969165,
+            "normalizedPng": 9121595,
+            "previewWebp": 391100,
+            "presetJpeg": 1441298,
+            "manualJpeg": 2335412
+          }
+        }
+      ]
+    },
+    {
+      "size": "12mp",
+      "width": 4000,
+      "height": 3000,
+      "runs": [
+        {
+          "normalize": {
+            "wallMs": 502.18,
+            "cpuMs": 528.62
+          },
+          "analyze": {
+            "wallMs": 204.39,
+            "cpuMs": 240.82
+          },
+          "preview": {
+            "wallMs": 306.13,
+            "cpuMs": 319.88
+          },
+          "presetExport": {
+            "wallMs": 800.74,
+            "cpuMs": 769.5
+          },
+          "manualExport": {
+            "wallMs": 3491.45,
+            "cpuMs": 3457.54
+          },
+          "bytes": {
+            "input": 2495143,
+            "normalizedPng": 24528999,
+            "previewWebp": 452802,
+            "presetJpeg": 3763914,
+            "manualJpeg": 5521542
+          }
+        },
+        {
+          "normalize": {
+            "wallMs": 487.39,
+            "cpuMs": 518.56
+          },
+          "analyze": {
+            "wallMs": 194.62,
+            "cpuMs": 238.14
+          },
+          "preview": {
+            "wallMs": 300.94,
+            "cpuMs": 317.24
+          },
+          "presetExport": {
+            "wallMs": 707.52,
+            "cpuMs": 738.03
+          },
+          "manualExport": {
+            "wallMs": 3428.11,
+            "cpuMs": 3396.17
+          },
+          "bytes": {
+            "input": 2495143,
+            "normalizedPng": 24528999,
+            "previewWebp": 452802,
+            "presetJpeg": 3763914,
+            "manualJpeg": 5521542
+          }
+        },
+        {
+          "normalize": {
+            "wallMs": 499.4,
+            "cpuMs": 528.22
+          },
+          "analyze": {
+            "wallMs": 187.03,
+            "cpuMs": 196.37
+          },
+          "preview": {
+            "wallMs": 295.23,
+            "cpuMs": 308.13
+          },
+          "presetExport": {
+            "wallMs": 678.57,
+            "cpuMs": 719.54
+          },
+          "manualExport": {
+            "wallMs": 3371.39,
+            "cpuMs": 3374.63
+          },
+          "bytes": {
+            "input": 2495143,
+            "normalizedPng": 24528999,
+            "previewWebp": 452802,
+            "presetJpeg": 3763914,
+            "manualJpeg": 5521542
+          }
+        }
+      ]
+    }
+  ]
+}
