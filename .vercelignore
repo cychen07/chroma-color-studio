@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.vercel
+.trae
+.screenshots
+data/uploads
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+*.log
+.DS_Store

@@ -7,3 +7,5 @@ data/uploads/
 .DS_Store
 .trae/
 .screenshots/
+.vercel
+.vercel/
