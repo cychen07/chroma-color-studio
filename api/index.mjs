@@ -3,8 +3,8 @@
 import app from '../server/index.mjs';
 
 export const config = {
-  // The color catalog is loaded through readFileSync, which Vercel's tracer cannot detect.
-  includeFiles: ['data/colors.json'],
+  // These are loaded through readFileSync, which Vercel's file tracer cannot detect.
+  includeFiles: ['data/colors.json', 'public/sample.jpg'],
   maxDuration: 30,
 };
 

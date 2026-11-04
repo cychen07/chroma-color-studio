@@ -157,11 +157,11 @@ function ExportModal({ photo, preset, strength, adjustments, onClose, notify }) 
     } catch (e) { setError(e.message || '导出失败，请重试。'); } finally { setBusy(false); }
   }
   return <Modal title="把喜欢的色彩带走" eyebrow="MAKE IT YOURS" onClose={onClose}>
-    <div className="export-preview"><GradeCanvas src={photo.previewUrl} preset={preset} strength={strength} adjustments={adjustments} maxSize={260} /><div><b>{preset.name}{adjustmentCount(adjustments) > 0 ? ' · 手动精调' : ''}</b><span>{photo.width} × {photo.height} · 原尺寸</span></div></div>
+    <div className="export-preview"><GradeCanvas src={photo.previewUrl} preset={preset} strength={strength} adjustments={adjustments} maxSize={260} /><div><b>{preset.name}{adjustmentCount(adjustments) > 0 ? ' · 手动精调' : ''}</b><span>{photo.width} × {photo.height}{config.maxExportEdge ? ` · 导出长边≤${config.maxExportEdge}px` : ' · 原尺寸'}</span></div></div>
     <p className="modal-description">选择格式，免费保存当前风格与全部手动调整。</p>
     <div className="format-row"><span>导出格式</span><div role="group" aria-label="导出格式">{['jpeg', 'png'].map(f => <button key={f} className={format === f ? 'selected' : ''} disabled={busy} onClick={() => setFormat(f)}>{f === 'jpeg' ? 'JPG · 高画质' : 'PNG · 无损'}</button>)}</div></div>
-    <p className="fineprint">不加水印 · 保留原始尺寸 · sRGB<br />JPG 将透明背景转为白色；PNG 保留透明度。</p>
-    <button className="primary full" onClick={download} disabled={busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowDownToLine size={17} />} {busy ? '正在生成原尺寸图片…' : '免费下载图片'}</button>
+    <p className="fineprint">不加水印 · {config.maxExportEdge ? `高清导出（长边≤${config.maxExportEdge}px）` : '保留原始尺寸'} · sRGB<br />JPG 将透明背景转为白色；PNG 保留透明度。</p>
+    <button className="primary full" onClick={download} disabled={busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowDownToLine size={17} />} {busy ? '正在生成图片…' : '免费下载图片'}</button>
     {error && <p role="alert" className="error-text">{error}</p>}
   </Modal>;
 }
@@ -337,7 +337,7 @@ export default function App() {
             </button>)}</div>
           </section>
           <section className="selected-style"><span className="selected-spark"><Sparkles size={18} /></span><div><b>{preset.name}<span> · {adjustmentCount(adjustments) ? `${adjustmentCount(adjustments)} 项手动精调` : preset.tag}</span></b><p>{preset.description} 选择新风格会重置手动参数。</p></div><button className={`save-button ${currentSaved ? 'saved' : ''}`} onClick={saveRecipe} disabled={!photo}><Bookmark size={16} fill={currentSaved ? 'currentColor' : 'none'} />{currentSaved ? '已收藏' : '收藏方案'}</button></section>
-          <section className="export-bar"><div className="export-promise"><div className="export-icon"><Layers2 size={22} strokeWidth={1.5} /></div><div><b>好看的色彩，值得留下。</b><p>原尺寸导出 <i /> 无水印 <i /> 自由切换风格</p></div></div><button className="primary export-primary" disabled={!photo || busy} onClick={() => setModal('export')}><ArrowDownToLine size={17} /><span>免费导出图片<small>原尺寸 · 包含全部调整</small></span><ArrowRight size={17} /></button></section>
+          <section className="export-bar"><div className="export-promise"><div className="export-icon"><Layers2 size={22} strokeWidth={1.5} /></div><div><b>好看的色彩，值得留下。</b><p>原尺寸导出 <i /> 无水印 <i /> 自由切换风格</p></div></div><button className="primary export-primary" disabled={!photo || busy} onClick={() => setModal('export')}><ArrowDownToLine size={17} /><span>免费导出图片<small>{config?.maxExportEdge ? `高清长边≤${config.maxExportEdge}px · ` : '原尺寸 · '}包含全部调整</small></span><ArrowRight size={17} /></button></section>
           <footer className="page-footer"><span>COLOR IS A FEELING.</span><p>每张照片，都有属于自己的色彩秩序。</p><button className="quiet" onClick={() => setModal('help')}>关于色序 <ArrowUpRight size={12} /></button></footer>
         </>}
         {nav === 'library' && (config ? <Library config={config} onColor={setSelectedColor} /> : <div className="empty-result">正在加载色库…</div>)}

@@ -78,7 +78,7 @@ cleanup();
 setInterval(cleanup, 600_000).unref();
 app.get('/api/config', (req, res) => res.json({
   colorCount: catalog.length, counts: dataset.counts, sourceUrl: dataset.sourceUrl,
-  exportMode: 'free', maxFileMB: 20,
+  exportMode: 'free', maxFileMB: 20, maxExportEdge: vercel ? 3200 : null,
   presets, version: '0.1.0',
 }));
 app.get('/api/colors', (req, res) => {
@@ -132,10 +132,14 @@ app.post('/api/photos/:id/export', expensiveLimit, async (req, res) => {
   let adjustments;
   try { adjustments = normalizeAdjustments(req.body.adjustments); }
   catch (error) { return res.status(400).json({ error: error.message }); }
-  const { data, info } = await sharp(filePath(photo.id, 'png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  // On Vercel Hobby the function response body is capped at 4.5 MB, so keep the
+  // serverless export inside that envelope. Self-hosted deployments export full size.
+  const source = sharp(filePath(photo.id, 'png')).ensureAlpha();
+  if (vercel) source.resize(3200, 3200, { fit: 'inside', withoutEnlargement: true });
+  const { data, info } = await source.raw().toBuffer({ resolveWithObject: true });
   gradePixels(data, preset, strength, adjustments, info.width, info.height);
   let output = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } });
-  output = format === 'png' ? output.png() : output.flatten({ background: '#ffffff' }).jpeg({ quality: 95, chromaSubsampling: '4:4:4' });
+  output = format === 'png' ? output.png({ compressionLevel: 9 }) : output.flatten({ background: '#ffffff' }).jpeg({ quality: vercel ? 90 : 95, chromaSubsampling: '4:4:4' });
   res.setHeader('Content-Disposition', `attachment; filename="chroma-${preset.id}.${format === 'png' ? 'png' : 'jpg'}"`);
   res.type(format).send(await output.toBuffer());
 });
